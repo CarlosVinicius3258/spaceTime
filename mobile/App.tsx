@@ -1,7 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
+import { ImageBackground, Text, View } from 'react-native';
 import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { BaiJamjuree_400Regular, BaiJamjuree_700Bold } from '@expo-google-fonts/bai-jamjuree';
+import blurBg from './src/assets/bg-blur.png';
+import Stripes from './src/assets/stripes.svg';
+import { styled } from 'nativewind';
+
+const StyledStripes = styled(Stripes);
 
 export default function App() {
   const [hasLoadedFonts] = useFonts({
@@ -13,9 +18,12 @@ export default function App() {
 
   if (!hasLoadedFonts) return (null);
   return (
-    <View className="flex-1 bg-gray-900 justify-center items-center">
-      <Text className="font-alt text-gray-50 text-5xl ">Rocketseat</Text>
+    <ImageBackground
+      source={ blurBg }
+      imageStyle={ { position: 'absolute', left: '-100%' } }
+      className="flex-1 bg-gray-900 relative">
+      <StyledStripes className='absolute left-2' />
       <StatusBar style="inverted" translucent />
-    </View>
+    </ImageBackground>
   );
 }
