@@ -2,13 +2,15 @@ import { StatusBar } from 'expo-status-bar';
 import { ImageBackground, Text, TouchableOpacity, View } from 'react-native';
 import { useFonts, Roboto_400Regular, Roboto_700Bold } from '@expo-google-fonts/roboto';
 import { BaiJamjuree_400Regular, BaiJamjuree_700Bold } from '@expo-google-fonts/bai-jamjuree';
-import blurBg from './src/assets/bg-blur.png';
-import Stripes from './src/assets/stripes.svg';
-import Logo from './src/assets/logo.svg';
+import blurBg from '../src/assets/bg-blur.png';
+import Stripes from '../src/assets/stripes.svg';
+import Logo from '../src/assets/logo.svg';
 import { styled } from 'nativewind';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import { useEffect } from 'react';
-import { api } from './src/lib/api';
+import { api } from '../src/lib/api';
+import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 
 const discovery = {
   authorizationEndpoint: 'https://github.com/login/oauth/authorize',
@@ -18,6 +20,7 @@ const discovery = {
 const StyledStripes = styled(Stripes);
 
 export default function App() {
+  const router = useRouter();
   const [hasLoadedFonts] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
@@ -36,18 +39,31 @@ export default function App() {
     discovery
   );
 
+  const handleGithubOauthCode = async (code: string) => {
+    const response = await api.post('/register', {
+      code
+    });
+
+    const { token } = response.data;
+
+    await SecureStore.setItemAsync('gh.token', token);
+    router.push('/memories');
+
+  };
+
+
 
   useEffect(() => {
+
     if (response?.type === 'success') {
       const { code } = response.params;
-      api.post('/register', {
-        code
-      }).then(res => {
-        const { token } = res.data;
-        console.log('token: ', token);
-      }).catch(err => {
-        console.log('err: ', err);
-      });
+      console.log("🚀 ~ file: index.tsx:60 ~ useEffect ~ code:", code);
+
+
+      (async () => {
+
+        await handleGithubOauthCode(code);
+      })();
     }
   }, [response]);
 
