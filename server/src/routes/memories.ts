@@ -15,8 +15,15 @@ export async function memoriesRoutes(app: FastifyInstance) {
   const paramsSchemaParse = (request: FastifyRequest) => paramsSchema.parse(request.params);
   const bodySchemaParse = (request: FastifyRequest) => bodySchema.parse(request.body);
 
-  app.get('/memories', async () => {
+  app.addHook('preHandler', async (request) => {
+    request.jwtVerify();
+  });
+
+  app.get('/memories', async (request) => {
     const memories = await prisma.memory.findMany({
+      where: {
+        idUser: request.user.sub,
+      },
       orderBy: {
         createdAt: 'asc',
       },
@@ -30,7 +37,7 @@ export async function memoriesRoutes(app: FastifyInstance) {
     });
   });
 
-  app.get('/memories/:id', async (request) => {
+  app.get('/memories/:id', async (request, reply) => {
     const { id } = paramsSchemaParse(request);
     console.log(id);
     const memory = await prisma.memory.findUniqueOrThrow({
@@ -38,6 +45,9 @@ export async function memoriesRoutes(app: FastifyInstance) {
         id,
       },
     });
+    if (!memory.isPublic && memory.idUser !== request.user.sub) {
+      reply.status(403).send({ message: 'Forbidden' });
+    }
     console.log(memory);
     return memory;
   });
@@ -51,16 +61,27 @@ export async function memoriesRoutes(app: FastifyInstance) {
         content,
         coverUrl,
         isPublic,
-        idUser: 'b3e18906-3f8a-4172-becd-9f0c33c1495b',
+        idUser: request.user.sub,
       },
     });
     return memory;
   });
 
-  app.put('/memories/:id', async (request) => {
+  app.put('/memories/:id', async (request, reply) => {
     const { id } = paramsSchemaParse(request);
     const body = bodySchemaParse(request);
-    const memory = prisma.memory.update({
+
+    let memory = await prisma.memory.findUniqueOrThrow({
+      where: {
+        id,
+      },
+    });
+
+    if (memory.idUser !== request.user.sub) {
+      reply.status(403).send({ message: 'Forbidden' });
+    }
+
+    memory = await prisma.memory.update({
       where: {
         id,
       },
@@ -73,13 +94,22 @@ export async function memoriesRoutes(app: FastifyInstance) {
     return memory;
   });
 
-  app.delete('/memories/:id', async (request) => {
+  app.delete('/memories/:id', async (request, reply) => {
     const { id } = paramsSchemaParse(request);
-    const memory = prisma.memory.delete({
+
+    const memory = await prisma.memory.findUniqueOrThrow({
       where: {
         id,
       },
     });
-    return memory;
+
+    if (memory.idUser !== request.user.sub) {
+      reply.status(403).send({ message: 'Forbidden' });
+    }
+    await prisma.memory.delete({
+      where: {
+        id,
+      },
+    });
   });
 }
