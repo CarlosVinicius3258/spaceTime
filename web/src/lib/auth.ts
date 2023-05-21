@@ -11,7 +11,8 @@ export function getUser() {
   const token = cookies().get('token')?.value
 
   if (!token) { 
-    throw new Error('Unauthenticated.')
+    console.log('Unauthenticated.')
+    return {} as User
   }
 
   const user = jwtDecode(token) as User

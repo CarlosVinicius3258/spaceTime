@@ -19,7 +19,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const isAuthenticated = cookies().has('token');
+  const isAuthenticated = cookies().has('token') && cookies().get('token')?.value !== 'null';
+  console.log("🚀 ~ file: layout.tsx:23 ~ isAuthenticated:", isAuthenticated);
 
   return (
     <html lang="en">
