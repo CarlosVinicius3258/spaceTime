@@ -3,7 +3,7 @@ import Copyright from '@/components/Copyright';
 import { Hero } from '@/components/Hero';
 import { SignIn } from '@/components/SignIn';
 import { EmptyMemories } from '@/components/EmptyMemories';
-import { Blur } from '@/components/Bluir';
+import { Blur } from '@/components/Blur';
 export default function Home() {
   return (
     <main className="grid grid-cols-2 min-h-screen">
