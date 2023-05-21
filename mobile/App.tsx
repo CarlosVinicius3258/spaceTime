@@ -6,7 +6,14 @@ import blurBg from './src/assets/bg-blur.png';
 import Stripes from './src/assets/stripes.svg';
 import Logo from './src/assets/logo.svg';
 import { styled } from 'nativewind';
+import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
+import { useEffect } from 'react';
 
+const discovery = {
+  authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+  tokenEndpoint: 'https://github.com/login/oauth/access_token',
+  revocationEndpoint: 'https://github.com/settings/connections/applications/c1fabe9c528fec528af2',
+};
 const StyledStripes = styled(Stripes);
 
 export default function App() {
@@ -16,6 +23,28 @@ export default function App() {
     BaiJamjuree_400Regular,
     BaiJamjuree_700Bold
   });
+
+  const [request, response, signInWithGitHub] = useAuthRequest(
+    {
+      clientId: 'c1fabe9c528fec528af2',
+      scopes: ['identity'],
+      redirectUri: makeRedirectUri({
+        scheme: 'nlwspacetime'
+      }),
+    },
+    discovery
+  );
+
+
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { code } = response.params;
+      console.log(code);
+    }
+  }, [response]);
+  console.log(makeRedirectUri({
+    scheme: 'nlwspacetime'
+  }),);
 
   if (!hasLoadedFonts) return (null);
   return (
@@ -32,6 +61,7 @@ export default function App() {
           <Text className='text-center font-body text-base leading-relaxed text-gray-100'>Colecione momentos marcantes da sua jornada e compartilhe (se quiser) com o mundo!</Text>
         </View>
         <TouchableOpacity
+          onPress={ () => signInWithGitHub() }
           activeOpacity={ 0.7 }
           className='rounded-full bg-green-500 px-5 py-2'
         >
