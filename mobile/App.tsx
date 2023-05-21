@@ -8,6 +8,7 @@ import Logo from './src/assets/logo.svg';
 import { styled } from 'nativewind';
 import { makeRedirectUri, useAuthRequest } from 'expo-auth-session';
 import { useEffect } from 'react';
+import { api } from './src/lib/api';
 
 const discovery = {
   authorizationEndpoint: 'https://github.com/login/oauth/authorize',
@@ -39,12 +40,16 @@ export default function App() {
   useEffect(() => {
     if (response?.type === 'success') {
       const { code } = response.params;
-      console.log(code);
+      api.post('/register', {
+        code
+      }).then(res => {
+        const { token } = res.data;
+        console.log('token: ', token);
+      }).catch(err => {
+        console.log('err: ', err);
+      });
     }
   }, [response]);
-  console.log(makeRedirectUri({
-    scheme: 'nlwspacetime'
-  }),);
 
   if (!hasLoadedFonts) return (null);
   return (
