@@ -41,6 +41,7 @@ export default function Layout() {
         }
       } } >
         <Stack.Screen name='index' redirect={ isUserAuthenticated } />
+        <Stack.Screen name='new' />
         <Stack.Screen name='memories' />
       </Stack>
       <Text className='text-center font-body text-sm leading-relaxed text-gray-200 py-10' > Feito com 💚 no NLW da Rocketseat</Text>
