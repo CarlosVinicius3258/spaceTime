@@ -13,7 +13,8 @@ export async function GET(request: NextRequest) {
 
   const { token } = registerResponse.data
   const redirectURL = redirectTo ? redirectTo : new URL( '/', request.url)
-  const cookiesExpiresInSeconds = 60 * 60 * 24 * 30  // 30 days
+  const cookiesExpiresInSeconds = 60 * 60 * 24 * 30;  // 30 days
+  
   return NextResponse.redirect(redirectURL, {
     headers: {
       'Set-Cookie': `token=${token}; Path=/; max-age=${cookiesExpiresInSeconds};}`

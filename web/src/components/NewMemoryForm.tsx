@@ -2,14 +2,45 @@
 import { Camera } from 'lucide-react';
 import { MediaPicker } from './MediaPicker';
 import { FormEvent } from 'react';
+import { api } from '@/lib/api';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+
 
 export function NewMemoryForm() {
+  const router = useRouter();
 
-  function handleClientMemory(event: FormEvent<HTMLFormElement>) {
+  async function handleClientMemory(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    console.log(Array.from(formData.entries()));
+    //mostrar lista de dados do formdata with Array() entries: 
+    const content = formData.get('content');
+    const isPublic = formData.get('isPublic');
+    let coverURL = '';
+    const token = Cookies.get('token');
+    const fileToUpload = formData.get('coverURL');
+
+    if (fileToUpload) {
+      const uploadFormData = new FormData();
+      uploadFormData.set('file', fileToUpload);
+
+      const uploadResponse = await api.post('/upload', uploadFormData,);
+      coverURL = uploadResponse.data.fileURL;
+
+
+      await api.post('/memories', {
+        coverUrl: coverURL,
+        content,
+        isPublic,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      router.push('/');
+    }
   }
   return (
     <form onSubmit={ handleClientMemory } className='flex flex-1 flex-col gap-2'>
