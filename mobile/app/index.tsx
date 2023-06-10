@@ -38,7 +38,7 @@ export default function App() {
     const { token } = response.data;
 
     await SecureStore.setItemAsync('gh.token', token);
-    router.push('/memories');
+    router.push('/new');
 
   };
 
@@ -61,8 +61,6 @@ export default function App() {
 
   return (
     <View
-
-
       className="flex-1 ">
 
 

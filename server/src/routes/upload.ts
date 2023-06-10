@@ -10,6 +10,7 @@ const pump = promisify(pipeline);
 const mimeTypeRegex = /^(image|video)\/[a-zA-Z]+/;
 export async function uploadRoutes(app: FastifyInstance) {
   app.post('/upload', async (request, reply) => {
+    console.log('uploading file');
     const upload = await request.file({
       limits: {
         fileSize: 5_242_880, // 5MB
@@ -37,6 +38,7 @@ export async function uploadRoutes(app: FastifyInstance) {
 
     const fullURl = request.protocol.concat('://').concat(request.hostname);
     const fileURL = new URL(`/uploads/${fileName}`, fullURl).toString();
+    console.log(fileURL);
     return { fileURL };
   });
 }
